@@ -1,0 +1,37 @@
+Cucumber-selenium > com.indecomm.automation > AbstractScenarios.java
+
+Add below function 
+
+public void addScreenShotInReport(AppiumDriver<MobileElement> pageDriver){
+		
+		File scrFile = ((TakesScreenshot) pageDriver).getScreenshotAs(OutputType.FILE);
+		String currentDir = System.getProperty("user.dir");
+		String filePath = currentDir + "/screenshots/" + System.currentTimeMillis() + ".png";
+		try {
+			FileUtils.copyFile(scrFile, new File(filePath));
+			Reporter.addScreenCaptureFromPath(filePath);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+  
+  
+  In step defination in scenario add
+  
+  abstrctaddscreen.addScreenShotInReport(driver);
+  
+  ex.
+  
+  public void user_is_on_Home_Page() throws Throwable {
+		System.out.println("First Test ");
+		driver = new AppiumDriverContext("/feedFiles/automationMobileData.json").getDriver("Android",
+				"Android_virtualdevice");
+		System.out.println("User is on Home Page virual device");
+		obj = new CommonScenariosAndroid();
+		
+		abstrctaddscreen.addScreenShotInReport(driver);
+		
+		// Write code here that turns the phrase above into concrete actions
+		// throw new PendingException();
+	}
