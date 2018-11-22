@@ -35,3 +35,11 @@ public void addScreenShotInReport(AppiumDriver<MobileElement> pageDriver){
 		// Write code here that turns the phrase above into concrete actions
 		// throw new PendingException();
 	}
+
+
+1) create folder "screenshots" on root folder
+2) run eclips command 
+ - Maven clean
+- Maven build -> Enter Goals > clean compile test-compile
+Eclips > right click > Run As > JUnit test
+--- Check target folder > cucumber-report
