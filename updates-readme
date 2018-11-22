@@ -16,6 +16,20 @@ public void addScreenShotInReport(AppiumDriver<MobileElement> pageDriver){
 		}
 	}
   
+  **********************************************************************
+  testrunner.java
+  
+  public class testrunner {
+	
+	@AfterClass
+    public static void writeExtentReport() {
+		
+        Reporter.loadXMLConfig(new File("config/report.xml"));
+
+}
+}
+  
+  **********************************************************************
   
   In step defination in scenario add
   
