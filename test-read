@@ -316,3 +316,113 @@ public class newtest {
 					
 	}
 }
+
+
+########
+
+<?php 
+/**
+  * File Downloader
+  * 
+*/
+
+define("CHUNK_SIZE", 1024 * 1024); 
+set_time_limit(0);
+@ini_set('max_execution_time', '-1');
+ini_set("memory_limit",-1);
+@ini_set('error_reporting', E_ALL & ~ E_NOTICE);
+
+if( isset($_GET['token']) ) {
+	$filenameToken = $_GET['token'];
+	$filename = bitEncryptOrDecryptQulidi( $filenameToken , 'd');
+
+	$headers = get_headers($filename , 1);
+
+	//echo "<pre>";echo $filename;print_r($headers); exit;
+
+	if (strstr(strtolower($headers[0]) ,"200" ) ) {
+		
+		// Option 2 start
+		/*
+		@session_write_close();
+		if (function_exists('apache_setenv')) {
+			@apache_setenv('no-gzip', 1);
+		}
+		if (get_magic_quotes_runtime()) {
+			@set_magic_quotes_runtime(0);
+		}
+		@ini_set('zlib.output_compression', 'Off');
+		@set_time_limit(0);
+		@ob_end_clean();
+		if (ob_get_level()) {
+			@ob_end_clean();
+			// Zip corruption fix.
+		}
+		
+		nocache_headers();
+		*/
+		header('Robots: none');
+		header('Content-Type: application/force-download');
+		header('Content-Description: File Transfer');
+		header('Content-Disposition: attachment; filename="' . basename($filename) . '";');
+		header('Content-Transfer-Encoding: binary');
+		header("Content-Length: ".$headers['Content-Length']);
+		readfile_chunked($filename);
+		// Option 2 end
+
+		exit;
+	}
+} else {
+	@header("location:https://www.bitwiseglobal.com");
+	exit;
+}
+function readfile_chunked($filename, $retbytes = TRUE) {
+	$buffer = "";
+	$cnt =0;
+	
+	$handle = fopen($filename, "rb");
+	
+	if ($handle === false) {
+		return false;
+	}
+	while (!feof($handle)) {
+		$buffer = fread($handle, CHUNK_SIZE);
+		echo $buffer;
+		@ob_end_clean();
+		if (ob_get_level()) {
+			@ob_end_clean();
+			// Zip corruption fix.
+		}
+		ob_flush();
+		flush();
+		if ($retbytes) {
+			$cnt += strlen($buffer);
+		}
+	}
+	$status = fclose($handle);
+	if ($retbytes && $status) {
+		return $cnt; // return num. bytes delivered like readfile() does.
+	}
+	return $status;
+}
+
+function bitEncryptOrDecryptQulidi($string, $action) {
+	$secret_key = 'my_simple_bitwiseadmin_key';
+	$secret_iv = 'my_simple_bitwiseadmin_iv';
+
+	$output = false;
+	$encrypt_method = "AES-256-CBC";
+	$key = hash( 'sha256', $secret_key );
+	$iv = substr( hash( 'sha256', $secret_iv ), 0, 16 );
+
+	if( $action == 'e' ) {
+		$output = base64_encode( openssl_encrypt( $string, $encrypt_method, $key, 0, $iv ) );
+	}
+	else if( $action == 'd' ){
+		$output = openssl_decrypt( base64_decode( $string ), $encrypt_method, $key, 0, $iv );
+	}
+
+	return $output; 
+} 
+
+?>
