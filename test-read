@@ -204,3 +204,115 @@ public class steptwo extends TestBase {
 	}
 
 }
+#########################
+
+package unit.Test;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
+
+import org.apache.commons.io.FileUtils;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.Keys;
+import org.openqa.selenium.Proxy;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeDriverService;
+import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.htmlunit.HtmlUnitDriver;
+import org.openqa.selenium.interactions.Action;
+import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.remote.DesiredCapabilities;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.gargoylesoftware.htmlunit.BrowserVersion;
+import java.util.Scanner;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+public class newtest {
+	public static void showDownloadsize(String downloadpath) throws Exception {
+		try {
+			String path = downloadpath;
+			if (path != null) {
+				    File folder = new File(path);
+				    long size, reSize;
+				    do {
+				        size = FileUtils.sizeOfDirectory(folder);
+				        Thread.sleep(5000);
+				        reSize = FileUtils.sizeOfDirectory(folder);
+				        System.out.println("Download :" + reSize);
+				    } while (size != reSize);
+				    System.out.println("Download completed");
+	          }           
+	} catch (Exception e) {
+	                e.printStackTrace();
+	                throw e;
+	 } finally {
+	       
+	}
+}
+	public static void main(String[] args) throws InterruptedException, ClientProtocolException, IOException {
+					Scanner scanner = new Scanner(new InputStreamReader(System.in));
+					System.out.println("Please enter download path: ");
+					String downloadPath = scanner.nextLine();
+					Thread.sleep(1000);	
+					ChromeOptions options = new ChromeOptions();
+					String downloadFilepath = downloadPath;
+					
+					Thread.sleep(2000);
+					  
+					System.out.println("This is a Windows system.");
+					System.setProperty("webdriver.chrome.driver", "C:\\webdriver\\chromedriver.exe");
+					//options.setBinary("C:\\Users\\Juri\\AppData\\Local\\Google\\Chrome SxS\\Application\\chrome.exe");
+					// If this is commented, the grabber will use the main Chrome
+					  
+					options.addArguments("--headless --disable-gpu");
+					options.addArguments("--test-type");
+					options.addArguments("--disable-extension");
+					
+					options.addArguments("--enable-download-resumption");
+					//options.setExperimentalOption(name, value)("--enable-download-resumption");
+					
+					ChromeDriverService driverService = ChromeDriverService.createDefaultService();
+					ChromeDriver driver = new ChromeDriver(driverService, options);
+					
+					Map<String, Object> commandParams = new HashMap<String, Object>();
+					commandParams.put("cmd", "Page.setDownloadBehavior");
+					Map<String, String> params = new HashMap<String, String>();
+					params.put("behavior", "allow");
+					params.put("downloadPath", downloadFilepath);
+					params.put("cmd", "Page.setDownloadBehavior");
+					
+					commandParams.put("params", params);
+					ObjectMapper objectMapper = new ObjectMapper();
+					CloseableHttpClient httpClient = HttpClientBuilder.create().build();
+					String command = objectMapper.writeValueAsString(commandParams);
+					String u = driverService.getUrl().toString() + "/session/" + driver.getSessionId() + "/chromium/send_command";
+					HttpPost request = new HttpPost(u);
+					request.addHeader("content-type", "application/json");
+					request.setEntity(new StringEntity(command));
+					httpClient.execute(request);
+					
+					driver.get("url");
+					driver.manage().timeouts().setScriptTimeout(15 , TimeUnit.MINUTES);
+					
+	}
+}
